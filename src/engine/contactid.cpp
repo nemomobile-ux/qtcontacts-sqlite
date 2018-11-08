@@ -52,6 +52,15 @@ quint32 dbIdFromString(const QString &s)
     return 0;
 }
 
+QByteArray dbIdToLocalId(quint32 dbId)
+{
+    return QByteArray::number(dbId);
+}
+
+quint32 dbIdFromLocalId(const QByteArray &s)
+{
+    return quint32(s.toLongLong());
+}
 }
 
 #include <QContactManagerEngine>
@@ -63,9 +72,15 @@ QContactId ContactId::apiId(const QContact &contact)
 
 QContactId ContactId::apiId(quint32 dbId)
 {
+#if QTPIM_VERSION < 59
     ContactId *eid = new ContactId(dbId);
     return QContactId(eid);
+#else
+    return QContactId(QContactManager::buildUri(default_uri, QMap<QString, QString>()),
+                          dbIdToLocalId(dbId));
+#endif
 }
+
 
 quint32 ContactId::databaseId(const QContact &contact)
 {
@@ -74,12 +89,17 @@ quint32 ContactId::databaseId(const QContact &contact)
 
 quint32 ContactId::databaseId(const QContactId &apiId)
 {
+#if QTPIM_VERSION < 59
     if (const QContactEngineId *eid = QContactManagerEngine::engineId(apiId)) {
         const ContactId *iid = static_cast<const ContactId*>(eid);
         return iid->m_databaseId;
     }
     return 0;
+#else
+    return dbIdFromLocalId(apiId.localId());
+#endif
 }
+
 
 const QContactId &ContactId::contactId(const QContactId &apiId)
 {
@@ -88,9 +108,14 @@ const QContactId &ContactId::contactId(const QContactId &apiId)
 
 QContactId ContactId::fromString(const QString &s)
 {
+#if QTPIM_VERSION < 59
     return apiId(dbIdFromString(s));
+#else
+    return apiId(dbIdFromLocalId(s.toUtf8()));
+#endif
 }
 
+#if QTPIM_VERSION < 59
 ContactId::ContactId(quint32 dbId)
     : QContactEngineId()
     , m_databaseId(dbId)
@@ -122,6 +147,7 @@ QContactEngineId* ContactId::clone() const
 {
     return new ContactId(m_databaseId);
 }
+#endif
 
 QString ContactId::toString() const
 {

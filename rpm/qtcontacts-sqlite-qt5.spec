@@ -1,3 +1,5 @@
+%define qtpim_verion %(rpm -q --qf "%{VERS""ION}\n" qt5-qtpim-contacts | tr --delete .  | cut -f1 -d"+" | cut -c1-3)
+
 Name: qtcontacts-sqlite-qt5
 Version: 0.2.36
 Release: 0
@@ -20,19 +22,19 @@ Requires: qt5-plugin-sqldriver-sqlite
 %defattr(-,root,root,-)
 %{_libdir}/qt5/plugins/contacts/*.so*
 
-%package tests
-Summary:    Unit tests for qtcontacts-sqlite-qt5
-Group:      System/Libraries
-BuildRequires:  pkgconfig(Qt5Test)
-Requires:   %{name} = %{version}-%{release}
+#%package tests
+#Summary:    Unit tests for qtcontacts-sqlite-qt5
+#Group:      System/Libraries
+#BuildRequires:  pkgconfig(Qt5Test)
+#Requires:   %{name} = %{version}-%{release}
 
-%description tests
-This package contains unit tests for the qtcontacts-sqlite-qt5 library.
+#%description tests
+#This package contains unit tests for the qtcontacts-sqlite-qt5 library.
 
-%files tests
-%defattr(-,root,root,-)
-/opt/tests/qtcontacts-sqlite-qt5/*
-%{_libdir}/qtcontacts-sqlite-qt5/libtestdlgg.so
+#%files tests
+#%defattr(-,root,root,-)
+#/opt/tests/qtcontacts-sqlite-qt5/*
+#%{_libdir}/qtcontacts-sqlite-qt5/libtestdlgg.so
 
 %package extensions
 Summary:    QtContacts extension headers for qtcontacts-sqlite-qt5
@@ -52,7 +54,7 @@ This package contains extension headers for the qtcontacts-sqlite-qt5 library.
 %setup -q -n %{name}-%{version}
 
 %build
-%qmake5 "VERSION=%{version}"
+%qmake5 "VERSION=%{version}" QTPIM_VERSION=%{qtpim_verion}
 make %{?_smp_mflags}
 
 %install

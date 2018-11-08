@@ -1,7 +1,6 @@
 TEMPLATE = subdirs
 SUBDIRS = \
-        src \
-        tests
+        src
 OTHER_FILES += rpm/qtcontacts-sqlite-qt5.spec
 
 tests.depends = src

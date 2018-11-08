@@ -36,17 +36,25 @@
 #include <QContactId>
 #include <QContact>
 
+#if QTPIM_VERSION < 59
 #include <QContactEngineId>
+#else
+#include <QSharedDataPointer>
+#endif
 
 QTCONTACTS_USE_NAMESPACE
 
+#if QTPIM_VERSION < 59
 class ContactId : public QContactEngineId
+#else
+class ContactId : public QSharedData
+#endif
 {
 public:
     static QContactId apiId(const QContact &contact);
-    static QContactId apiId(quint32 databaseId);
-
     static quint32 databaseId(const QContact &contact);
+
+    static QContactId apiId(quint32 databaseId);
     static quint32 databaseId(const QContactId &apiId);
 
     static const QContactId &contactId(const QContactId &apiId);
@@ -63,11 +71,13 @@ public:
     ContactId(quint32 databaseId);
     ContactId(const QString &s);
 
+    QString managerUri() const;
+#if QTPIM_VERSION < 59
     // implementing QContactEngineId:
     bool isEqualTo(const QContactEngineId *other) const;
     bool isLessThan(const QContactEngineId *other) const;
-    QString managerUri() const;
     QContactEngineId* clone() const;
+#endif
     QString toString() const;
 
 #ifndef QT_NO_DEBUG_STREAM

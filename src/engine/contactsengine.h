@@ -118,7 +118,12 @@ public:
             const QString &relationshipType,
             const QContact &participant,
             QContactRelationship::Role role,
-            QContactManager::Error *error) const override;
+            QContactManager::Error *error) const
+#if QTPIM_VERSION < 59
+    override
+#endif
+    ;
+
     bool saveRelationships(
             QList<QContactRelationship> *relationships,
             QMap<int, QContactManager::Error> *errorMap,

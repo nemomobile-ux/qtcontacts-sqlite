@@ -658,10 +658,15 @@ static QContactRelationship makeRelationship(const QString &type, quint32 firstI
 {
     QContactRelationship relationship;
     relationship.setRelationshipType(type);
-
+#if QTPIM_VERSION < 59
     QContact first, second;
     first.setId(ContactId::apiId(firstId));
     second.setId(ContactId::apiId(secondId));
+#else
+    QContactId first, second;
+    first = QContactId::fromString(QString::number(firstId));
+    second = QContactId::fromString(QString::number(secondId));
+#endif
     relationship.setFirst(first);
     relationship.setSecond(second);
 
@@ -1227,7 +1232,11 @@ static QString buildWhere(const QContactIdFilter &filter, ContactsDatabase &db, 
 
 static QString buildWhere(const QContactRelationshipFilter &filter, QVariantList *bindings, bool *failed)
 {
+#if QTPIM_VERSION < 59
     QContactId rci = filter.relatedContact().id();
+#else
+    QContactId rci = filter.relatedContactId();
+#endif
 
     QContactRelationship::Role rcr = filter.relatedContactRole();
     QString rt = filter.relationshipType();
@@ -2175,7 +2184,17 @@ QContactManager::Error ContactReader::queryContacts(
         QContactGender gender;
         // Gender is an enum in qtpim
         QString genderText = contactQuery.value(col++).toString();
+#if QTPIM_VERSION < 59
         gender.setGender(static_cast<QContactGender::GenderField>(genderText.toInt()));
+#else
+        if(genderText == "Male") {
+            gender.setGender(QContactGender::GenderType::GenderMale);
+        } else if (genderText == "Female") {
+            gender.setGender(QContactGender::GenderType::GenderFemale);
+        } else {
+            gender.setGender(QContactGender::GenderType::GenderUnspecified);
+        }
+#endif
         contact.saveDetail(&gender);
 
         QContactFavorite favorite;
