@@ -466,13 +466,8 @@ public:
     RelationshipFetchJob(QContactRelationshipFetchRequest *request)
         : TemplateJob(request)
         , m_type(request->relationshipType())
-#if QTPIM_VERSION < 59
-        , m_first(request->first().id())
-        , m_second(request->second().id())
-#else
         , m_first(request->first().managerUri(), request->first().localId())
         , m_second(request->second().managerUri(), request->second().localId())
-#endif
     {
     }
 
@@ -1409,21 +1404,13 @@ void ContactsEngine::_q_contactsAdded(const QVector<quint32> &contactIds)
 
 void ContactsEngine::_q_contactsChanged(const QVector<quint32> &contactIds)
 {
-#if QTPIM_VERSION < 59
-    emit contactsChanged(idList(contactIds));
-#else
     emit contactsChanged(idList(contactIds), detalId());
-#endif
 }
 
 void ContactsEngine::_q_contactsPresenceChanged(const QVector<quint32> &contactIds)
 {
     if (m_mergePresenceChanges) {
-#if QTPIM_VERSION < 59
-        emit contactsChanged(idList(contactIds));
-#else
         emit contactsChanged(idList(contactIds), detalId());
-#endif
     } else {
         emit contactsPresenceChanged(idList(contactIds));
     }

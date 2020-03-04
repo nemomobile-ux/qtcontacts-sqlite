@@ -72,13 +72,8 @@ QContactId ContactId::apiId(const QContact &contact)
 
 QContactId ContactId::apiId(quint32 dbId)
 {
-#if QTPIM_VERSION < 59
-    ContactId *eid = new ContactId(dbId);
-    return QContactId(eid);
-#else
     return QContactId(QContactManager::buildUri(default_uri, QMap<QString, QString>()),
                           dbIdToLocalId(dbId));
-#endif
 }
 
 
@@ -89,15 +84,7 @@ quint32 ContactId::databaseId(const QContact &contact)
 
 quint32 ContactId::databaseId(const QContactId &apiId)
 {
-#if QTPIM_VERSION < 59
-    if (const QContactEngineId *eid = QContactManagerEngine::engineId(apiId)) {
-        const ContactId *iid = static_cast<const ContactId*>(eid);
-        return iid->m_databaseId;
-    }
-    return 0;
-#else
     return dbIdFromLocalId(apiId.localId());
-#endif
 }
 
 
@@ -108,46 +95,8 @@ const QContactId &ContactId::contactId(const QContactId &apiId)
 
 QContactId ContactId::fromString(const QString &s)
 {
-#if QTPIM_VERSION < 59
-    return apiId(dbIdFromString(s));
-#else
     return apiId(dbIdFromLocalId(s.toUtf8()));
-#endif
 }
-
-#if QTPIM_VERSION < 59
-ContactId::ContactId(quint32 dbId)
-    : QContactEngineId()
-    , m_databaseId(dbId)
-{
-}
-
-ContactId::ContactId(const QString &s)
-    : QContactEngineId()
-    , m_databaseId(dbIdFromString(s))
-{
-}
-
-bool ContactId::isEqualTo(const QContactEngineId *other) const
-{
-    return m_databaseId == static_cast<const ContactId*>(other)->m_databaseId;
-}
-
-bool ContactId::isLessThan(const QContactEngineId *other) const
-{
-    return m_databaseId < static_cast<const ContactId*>(other)->m_databaseId;
-}
-
-QString ContactId::managerUri() const
-{
-    return QContactManager::buildUri(default_uri, QMap<QString, QString>());
-}
-
-QContactEngineId* ContactId::clone() const
-{
-    return new ContactId(m_databaseId);
-}
-#endif
 
 QString ContactId::toString() const
 {
