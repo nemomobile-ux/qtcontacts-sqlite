@@ -23,6 +23,10 @@ packagesExist(mlite5) {
 DEFINES += 'QTCONTACTS_SQLITE_PRIVILEGED_DIR=\'\"privileged\"\''
 DEFINES += 'QTCONTACTS_SQLITE_DATABASE_DIR=\'\"Contacts/qtcontacts-sqlite\"\''
 DEFINES += 'QTCONTACTS_SQLITE_DATABASE_NAME=\'\"contacts.db\"\''
+
+# library path
+DEFINES += 'DEFAULT_PLUGIN_PATH=\'\"$$[QT_INSTALL_LIBS]/qtcontacts-sqlite-qt5\"\''
+
 # we build a path like: /home/nemo/.local/share/system/Contacts/qtcontacts-sqlite/contacts.db
 
 # Use the option to sort presence state by availability
@@ -70,7 +74,7 @@ headers.files = ../extensions/*
 headers.depends = ../extensions/*
 INSTALLS += headers
 
-pkgconfig.path = $${PREFIX}/lib/pkgconfig
+pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
 pkgconfig.files = ../$${PACKAGENAME}.pc
 INSTALLS += pkgconfig
 
